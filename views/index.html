@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Metadata Microservice</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>File Metadata Microservice</h1>
+    <p>freeCodeCamp Back End Development and APIs Project</p>
+    
+    <div class="upload-section">
+      <h2>Subir un archivo</h2>
+      <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="fileInput" name="upfile" required>
+        <button type="submit">Subir archivo</button>
+      </form>
+    </div>
 
+    <div class="result-section" id="result" style="display: none;">
+      <h2>Metadatos del archivo:</h2>
+      <div id="metadata"></div>
+    </div>
+
+    <div class="usage">
+      <h3>Uso de la API:</h3>
+      <code>POST /api/fileanalyse</code>
+      <p>Sube un archivo con el campo 'upfile'</p>
+      
+      <h3>Respuesta:</h3>
+      <pre>{
+  "name": "nombre-del-archivo.ext",
+  "type": "tipo-mime",
+  "size": 12345
+}</pre>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const fileInput = document.getElementById('fileInput');
+      const formData = new FormData();
+      formData.append('upfile', fileInput.files[0]);
+
+      try {
+        const response = await fetch('/api/fileanalyse', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          document.getElementById('metadata').innerHTML = `
+            <p><strong>Nombre:</strong> ${data.name}</p>
+            <p><strong>Tipo:</strong> ${data.type}</p>
+            <p><strong>Tamaño:</strong> ${data.size} bytes</p>
+          `;
+          document.getElementById('result').style.display = 'block';
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (error) {
+        alert('Error al subir el archivo');
+      }
+    });
+  </script>
+</body>
+</html>
